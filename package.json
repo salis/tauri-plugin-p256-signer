@@ -1,8 +1,8 @@
 {
-  "name": "tauri-plugin-p256-signer-api",
+  "name": "@0x330a/tauri-plugin-p256-signer-api",
   "version": "0.1.0",
-  "author": "You",
-  "description": "",
+  "author": "0x330a",
+  "description": "JS Bindings for the tauri-plugin-p256-signer Tauri plugin",
   "type": "module",
   "types": "./dist-js/index.d.ts",
   "main": "./dist-js/index.cjs",
