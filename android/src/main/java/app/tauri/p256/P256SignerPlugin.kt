@@ -1,13 +1,7 @@
 package app.tauri.p256
 
 import android.app.Activity
-import android.os.Build
-import androidx.credentials.CreatePublicKeyCredentialRequest
-import androidx.credentials.CreatePublicKeyCredentialResponse
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetPublicKeyCredentialOption
-import androidx.credentials.PublicKeyCredential
+import androidx.credentials.*
 import app.tauri.Logger
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
@@ -38,12 +32,9 @@ class P256SignerPlugin(private val activity: Activity): Plugin(activity) {
     private val scope = CoroutineScope(IO + SupervisorJob())
     private var isRequesting = false;
 
-    companion object {
-        const val ANDROID_KEYSTORE = "AndroidKeyStore"
-    }
-
     @Command
     fun create_credential(invoke: Invoke) {
+        // todo: error handling and try catch / check for google services
         val invokeParams = invoke.parseArgs(CreateCredentialRequestParams::class.java)
         if (isRequesting) return
         isRequesting = true
@@ -51,9 +42,6 @@ class P256SignerPlugin(private val activity: Activity): Plugin(activity) {
             val request = CreatePublicKeyCredentialRequest(invokeParams.creationParams)
             val response = credentialManager.createCredential(activity, request)
             val pubkeyResponse = response as? CreatePublicKeyCredentialResponse
-            Logger.debug("response type: ${response.type}")
-            Logger.debug("pubkeyResponse: ${pubkeyResponse?.registrationResponseJson}")
-            // todo: error handling and try catch
             invoke.resolveObject(PubKeyResponse(pubkeyResponse!!.registrationResponseJson))
             isRequesting = false
         }
@@ -61,16 +49,14 @@ class P256SignerPlugin(private val activity: Activity): Plugin(activity) {
 
     @Command
     fun get_credential(invoke: Invoke) {
+        // todo: error handling and try catch / check for google services
+        val invokeParams = invoke.parseArgs(GetCredentialRequestParams::class.java)
         if (isRequesting) return
         isRequesting = true
         scope.launch {
-            val invokeParams = invoke.parseArgs(GetCredentialRequestParams::class.java)
-            Logger.debug("credentialReqJSON: ${invokeParams.getParams}")
             val credentialRequest = GetPublicKeyCredentialOption(invokeParams.getParams)
-            Logger.debug("credentialRequest: ${credentialRequest.requestJson}")
             val request = GetCredentialRequest(listOf(credentialRequest))
             val response = credentialManager.getCredential(activity, request)
-            Logger.debug("response cred: ${response.credential}")
             val pubKeyCred = response.credential as PublicKeyCredential
             invoke.resolveObject(PubKeyResponse(pubKeyCred.authenticationResponseJson))
             isRequesting = false
