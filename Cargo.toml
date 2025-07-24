@@ -12,7 +12,7 @@ links = "tauri-plugin-p256-signer"
 tauri = "2.5.0"
 serde = "1.0"
 thiserror = "2"
-tauri-cli = "2.7.1"
 
 [build-dependencies]
 tauri-plugin = { version = "2.2.0", features = ["build"] }
+tauri-cli = "2.7.1"
