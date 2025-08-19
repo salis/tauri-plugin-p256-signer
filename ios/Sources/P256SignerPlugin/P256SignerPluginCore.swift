@@ -20,7 +20,7 @@ public final class P256SignerPluginCore: NSObject {
                 userID: userID
             )
             if let displayName = params.userDisplayName {
-                request.userName = displayName
+                request.displayName = displayName
             }
 
             let controller = ASAuthorizationController(authorizationRequests: [request])
@@ -97,10 +97,18 @@ private final class RegistrationDelegate: NSObject, ASAuthorizationControllerDel
             completion(.failure(NSError(domain: "P256SignerPlugin", code: -2, userInfo: [NSLocalizedDescriptionKey: "Unexpected credential type"])))
             return
         }
+        
+        // Safely unwrap optional Data values
+        guard let rawAttestationObject = credential.rawAttestationObject,
+              let rawClientDataJSON = credential.rawClientDataJSON else {
+            completion(.failure(NSError(domain: "P256SignerPlugin", code: -3, userInfo: [NSLocalizedDescriptionKey: "Missing required credential data"])))
+            return
+        }
+        
         let result = CredentialResult(
             id: Base64URL.encode(credential.credentialID),
-            rawAttestationObject: Base64URL.encode(credential.rawAttestationObject),
-            clientDataJSON: Base64URL.encode(credential.rawClientDataJSON)
+            rawAttestationObject: Base64URL.encode(rawAttestationObject),
+            clientDataJSON: Base64URL.encode(rawClientDataJSON)
         )
         completion(.success(result))
     }
