@@ -1,7 +1,6 @@
 
 import Foundation
 
-// JSON bridge helpers for easy binding from Rust/Tauri mobile.
 public final class P256SignerPluginBridge {
     private let core = P256SignerPluginCore()
 

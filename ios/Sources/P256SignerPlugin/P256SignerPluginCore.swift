@@ -1,7 +1,6 @@
 
 import Foundation
 import AuthenticationServices
-import UIKit
 
 public final class P256SignerPluginCore: NSObject {
 
@@ -9,10 +8,6 @@ public final class P256SignerPluginCore: NSObject {
         super.init()
     }
 
-    // MARK: - Public API (to be called from Tauri bridge or Plugin.swift)
-
-    /// Create a passkey credential (WebAuthn registration).
-    /// Returns credential id + attestation object + clientDataJSON (all base64url).
     public func createCredential(params: CreateCredentialParams, completion: @escaping (Result<CredentialResult, Error>) -> Void) {
         do {
             let challenge = try Base64URL.decode(params.challenge)
@@ -33,7 +28,7 @@ public final class P256SignerPluginCore: NSObject {
                 completion(result)
             }
             controller.delegate = delegate
-            controller.presentationContextProvider = DefaultPresentationContext.shared
+            controller.presentationContextProvider = nil
             objc_setAssociatedObject(controller, &AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             controller.performRequests()
         } catch {
@@ -41,7 +36,6 @@ public final class P256SignerPluginCore: NSObject {
         }
     }
 
-    /// Get/assert a passkey credential for a challenge (WebAuthn assertion).
     public func getCredential(params: GetCredentialParams, completion: @escaping (Result<AssertionResult, Error>) -> Void) {
         do {
             let challenge = try Base64URL.decode(params.challenge)
@@ -53,7 +47,7 @@ public final class P256SignerPluginCore: NSObject {
                 completion(result)
             }
             controller.delegate = delegate
-            controller.presentationContextProvider = DefaultPresentationContext.shared
+            controller.presentationContextProvider = nil
             objc_setAssociatedObject(controller, &AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             controller.performRequests()
         } catch {
@@ -61,7 +55,6 @@ public final class P256SignerPluginCore: NSObject {
         }
     }
 
-    /// Convenience for assertion with optional allowCredentials filter and returning a signature.
     public func sign(params: SignParams, completion: @escaping (Result<AssertionResult, Error>) -> Void) {
         do {
             let challenge = try Base64URL.decode(params.challenge)
@@ -79,7 +72,7 @@ public final class P256SignerPluginCore: NSObject {
                 completion(result)
             }
             controller.delegate = delegate
-            controller.presentationContextProvider = DefaultPresentationContext.shared
+            controller.presentationContextProvider = nil
             objc_setAssociatedObject(controller, &AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             controller.performRequests()
         } catch {
@@ -87,8 +80,6 @@ public final class P256SignerPluginCore: NSObject {
         }
     }
 }
-
-// MARK: - Delegates
 
 private enum AssociationKey {
     static var delegateKey = "P256SignerPlugin_delegate_key"

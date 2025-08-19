@@ -21,10 +21,5 @@ public class P256SignerPlugin: NSObject, TauriPlugin {
     }
 }
 #else
-// Lightweight shims so the package can compile outside Tauri builds.
-@objc public protocol _ShimTauriPlugin {}
-
-@objc public class P256SignerPlugin: NSObject {
-    // No-op; host without Tauri should not try to register commands.
-}
+@objc public class P256SignerPlugin: NSObject {}
 #endif
