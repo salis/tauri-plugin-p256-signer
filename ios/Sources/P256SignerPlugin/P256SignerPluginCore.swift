@@ -29,7 +29,7 @@ public final class P256SignerPluginCore: NSObject {
             }
             controller.delegate = delegate
             controller.presentationContextProvider = nil
-            objc_setAssociatedObject(controller, &AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             controller.performRequests()
         } catch {
             completion(.failure(error))
@@ -48,7 +48,7 @@ public final class P256SignerPluginCore: NSObject {
             }
             controller.delegate = delegate
             controller.presentationContextProvider = nil
-            objc_setAssociatedObject(controller, &AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             controller.performRequests()
         } catch {
             completion(.failure(error))
@@ -73,7 +73,7 @@ public final class P256SignerPluginCore: NSObject {
             }
             controller.delegate = delegate
             controller.presentationContextProvider = nil
-            objc_setAssociatedObject(controller, &AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             controller.performRequests()
         } catch {
             completion(.failure(error))
