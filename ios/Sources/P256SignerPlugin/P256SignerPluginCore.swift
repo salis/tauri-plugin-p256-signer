@@ -63,7 +63,7 @@ public final class P256SignerPluginCore: NSObject {
             if let allow = params.allowCredentialIds {
                 request.allowedCredentials = try allow.map {
                     let id = try Base64URL.decode($0)
-                    return ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: id, transports: .allSupported)
+                    return ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: id)
                 }
             }
 
