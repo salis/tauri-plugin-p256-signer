@@ -2,22 +2,27 @@
 import PackageDescription
 
 let package = Package(
-    name: "P256SignerPlugin",
+    name: "tauri-plugin-p256-signer",
     platforms: [
         .iOS(.v17)
     ],
     products: [
-        .library(name: "P256SignerPlugin", targets: ["P256SignerPlugin"])
+        .library(
+            name: "tauri-plugin-p256-signer",
+            type: .static,
+            targets: ["tauri-plugin-p256-signer"]),
     ],
     targets: [
         .target(
-            name: "P256SignerPlugin",
-            dependencies: [],
+            name: "tauri-plugin-p256-signer",
+            dependencies: [
+                .byName(name: "Tauri")
+            ],
             path: "Sources/P256SignerPlugin"
         ),
         .testTarget(
             name: "P256SignerPluginTests",
-            dependencies: ["P256SignerPlugin"],
+            dependencies: ["tauri-plugin-p256-signer"],
             path: "Tests/P256SignerPluginTests"
         ),
     ]
