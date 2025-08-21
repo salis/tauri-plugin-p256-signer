@@ -1,11 +1,12 @@
 
 import Foundation
+
 #if canImport(Tauri)
 import Tauri
 import SwiftRs
-#endif
 
-@objc public class P256SignerPlugin: NSObject {
+@available(iOS 17, *)
+public class P256SignerPlugin: Plugin {
     private let bridge = P256SignerPluginBridge()
 
     @objc public func create_credential(_ invoke: Any) -> Void {
@@ -19,22 +20,8 @@ import SwiftRs
     }
 }
 
-#if canImport(Tauri)
-extension P256SignerPlugin: Plugin {
-    public func register(with app: TauriApp) {
-        app.register(command: "create_credential") { (json: String, completion: @escaping (String) -> Void) in
-            self.bridge.createCredential(json: json, completion: completion)
-        }
-        app.register(command: "get_credential") { (json: String, completion: @escaping (String) -> Void) in
-            self.bridge.getCredential(json: json, completion: completion)
-        }
-        app.register(command: "sign") { (json: String, completion: @escaping (String) -> Void) in
-            self.bridge.sign(json: json, completion: completion)
-        }
-    }
-}
-
 @_cdecl("init_plugin_p256_signer")
+@available(iOS 17, *)
 func initPlugin() -> Plugin {
   return P256SignerPlugin()
 }

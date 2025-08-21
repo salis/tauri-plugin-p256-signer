@@ -1,6 +1,7 @@
 
 import Foundation
 
+@available(iOS 17, *)
 public final class P256SignerPluginBridge {
     private let core = P256SignerPluginCore()
 
