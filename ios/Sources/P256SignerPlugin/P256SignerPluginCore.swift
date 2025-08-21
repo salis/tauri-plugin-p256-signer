@@ -97,16 +97,9 @@ private final class RegistrationDelegate: NSObject, ASAuthorizationControllerDel
             completion(.failure(NSError(domain: "P256SignerPlugin", code: -2, userInfo: [NSLocalizedDescriptionKey: "Unexpected credential type"])))
             return
         }
-        
-        // Safely unwrap optional Data values
-        guard let rawAttestationObject = credential.rawAttestationObject else {
-            completion(.failure(NSError(domain: "P256SignerPlugin", code: -3, userInfo: [NSLocalizedDescriptionKey: "Missing required attestation object"])))
-            return
-        }
-        
         let result = CredentialResult(
             id: Base64URL.encode(credential.credentialID),
-            rawAttestationObject: Base64URL.encode(rawAttestationObject),
+            rawAttestationObject: Base64URL.encode(credential.rawAttestationObject!),
             clientDataJSON: Base64URL.encode(credential.rawClientDataJSON)
         )
         completion(.success(result))

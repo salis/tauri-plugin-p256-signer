@@ -1,4 +1,3 @@
-
 // swift-tools-version:5.9
 import PackageDescription
 
@@ -8,7 +7,7 @@ let package = Package(
         .iOS(.v17)
     ],
     products: [
-        .library(name: "P256SignerPlugin", targets: ["P256SignerPlugin"]),
+        .library(name: "P256SignerPlugin", targets: ["P256SignerPlugin"])
     ],
     targets: [
         .target(

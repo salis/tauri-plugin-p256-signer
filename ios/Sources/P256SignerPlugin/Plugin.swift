@@ -1,13 +1,26 @@
 
 import Foundation
-
 #if canImport(Tauri)
 import Tauri
+import SwiftRs
+#endif
 
-@objc(P256SignerPlugin)
-public class P256SignerPlugin: NSObject, TauriPlugin {
+@objc public class P256SignerPlugin: NSObject {
     private let bridge = P256SignerPluginBridge()
 
+    @objc public func create_credential(_ invoke: Any) -> Void {
+        // Host should call the bridge.createCredential with JSON string and expect callback
+    }
+
+    @objc public func get_credential(_ invoke: Any) -> Void {
+    }
+
+    @objc public func sign(_ invoke: Any) -> Void {
+    }
+}
+
+#if canImport(Tauri)
+extension P256SignerPlugin: Plugin {
     public func register(with app: TauriApp) {
         app.register(command: "create_credential") { (json: String, completion: @escaping (String) -> Void) in
             self.bridge.createCredential(json: json, completion: completion)
@@ -19,7 +32,17 @@ public class P256SignerPlugin: NSObject, TauriPlugin {
             self.bridge.sign(json: json, completion: completion)
         }
     }
+
+    @_cdecl("init_plugin_p256_signer")
+    public func initPluginP256Signer() -> UnsafeMutableRawPointer? {
+        let plugin = P256SignerPlugin()
+        let unmanaged = Unmanaged.passRetained(plugin)
+        return UnsafeMutableRawPointer(unmanaged.toOpaque())
+    }
 }
 #else
-@objc public class P256SignerPlugin: NSObject {}
+@_cdecl("init_plugin_p256_signer")
+public func initPluginP256Signer() -> UnsafeMutableRawPointer? {
+    return nil
+}
 #endif
