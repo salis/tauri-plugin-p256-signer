@@ -32,13 +32,11 @@ extension P256SignerPlugin: Plugin {
             self.bridge.sign(json: json, completion: completion)
         }
     }
+}
 
-    @_cdecl("init_plugin_p256_signer")
-    public func initPluginP256Signer() -> UnsafeMutableRawPointer? {
-        let plugin = P256SignerPlugin()
-        let unmanaged = Unmanaged.passRetained(plugin)
-        return UnsafeMutableRawPointer(unmanaged.toOpaque())
-    }
+@_cdecl("init_plugin_p256_signer")
+func initPlugin() -> Plugin {
+  return P256SignerPlugin()
 }
 #else
 @_cdecl("init_plugin_p256_signer")
