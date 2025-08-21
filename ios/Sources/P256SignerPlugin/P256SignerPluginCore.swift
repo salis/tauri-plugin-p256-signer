@@ -1,19 +1,23 @@
-
-import Foundation
 import AuthenticationServices
+import Foundation
 
+@available(iOS 17, *)
 public final class P256SignerPluginCore: NSObject {
 
     public override init() {
         super.init()
     }
 
-    public func createCredential(params: CreateCredentialParams, completion: @escaping (Result<CredentialResult, Error>) -> Void) {
+    public func createCredential(
+        params: CreateCredentialParams,
+        completion: @escaping (Result<CredentialResult, Error>) -> Void
+    ) {
         do {
             let challenge = try Base64URL.decode(params.challenge)
             let userID = try Base64URL.decode(params.userId)
 
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: params.rpId)
+            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                relyingPartyIdentifier: params.rpId)
             let request = provider.createCredentialRegistrationRequest(
                 challenge: challenge,
                 name: params.userName,
@@ -29,17 +33,22 @@ public final class P256SignerPluginCore: NSObject {
             }
             controller.delegate = delegate
             controller.presentationContextProvider = nil
-            objc_setAssociatedObject(controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(
+                controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
             controller.performRequests()
         } catch {
             completion(.failure(error))
         }
     }
 
-    public func getCredential(params: GetCredentialParams, completion: @escaping (Result<AssertionResult, Error>) -> Void) {
+    public func getCredential(
+        params: GetCredentialParams, completion: @escaping (Result<AssertionResult, Error>) -> Void
+    ) {
         do {
             let challenge = try Base64URL.decode(params.challenge)
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: params.rpId)
+            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                relyingPartyIdentifier: params.rpId)
             let request = provider.createCredentialAssertionRequest(challenge: challenge)
 
             let controller = ASAuthorizationController(authorizationRequests: [request])
@@ -48,17 +57,22 @@ public final class P256SignerPluginCore: NSObject {
             }
             controller.delegate = delegate
             controller.presentationContextProvider = nil
-            objc_setAssociatedObject(controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(
+                controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
             controller.performRequests()
         } catch {
             completion(.failure(error))
         }
     }
 
-    public func sign(params: SignParams, completion: @escaping (Result<AssertionResult, Error>) -> Void) {
+    public func sign(
+        params: SignParams, completion: @escaping (Result<AssertionResult, Error>) -> Void
+    ) {
         do {
             let challenge = try Base64URL.decode(params.challenge)
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: params.rpId)
+            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                relyingPartyIdentifier: params.rpId)
             let request = provider.createCredentialAssertionRequest(challenge: challenge)
             if let allow = params.allowCredentialIds {
                 request.allowedCredentials = try allow.map {
@@ -73,7 +87,9 @@ public final class P256SignerPluginCore: NSObject {
             }
             controller.delegate = delegate
             controller.presentationContextProvider = nil
-            objc_setAssociatedObject(controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(
+                controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
             controller.performRequests()
         } catch {
             completion(.failure(error))
@@ -92,9 +108,19 @@ private final class RegistrationDelegate: NSObject, ASAuthorizationControllerDel
         self.completion = completion
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        guard let credential = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration else {
-            completion(.failure(NSError(domain: "P256SignerPlugin", code: -2, userInfo: [NSLocalizedDescriptionKey: "Unexpected credential type"])))
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithAuthorization authorization: ASAuthorization
+    ) {
+        guard
+            let credential = authorization.credential
+                as? ASAuthorizationPlatformPublicKeyCredentialRegistration
+        else {
+            completion(
+                .failure(
+                    NSError(
+                        domain: "P256SignerPlugin", code: -2,
+                        userInfo: [NSLocalizedDescriptionKey: "Unexpected credential type"])))
             return
         }
         let result = CredentialResult(
@@ -105,7 +131,9 @@ private final class RegistrationDelegate: NSObject, ASAuthorizationControllerDel
         completion(.success(result))
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    func authorizationController(
+        controller: ASAuthorizationController, didCompleteWithError error: Error
+    ) {
         completion(.failure(error))
     }
 }
@@ -117,9 +145,19 @@ private final class AssertionDelegate: NSObject, ASAuthorizationControllerDelega
         self.completion = completion
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        guard let assertion = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion else {
-            completion(.failure(NSError(domain: "P256SignerPlugin", code: -2, userInfo: [NSLocalizedDescriptionKey: "Unexpected credential type"])))
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithAuthorization authorization: ASAuthorization
+    ) {
+        guard
+            let assertion = authorization.credential
+                as? ASAuthorizationPlatformPublicKeyCredentialAssertion
+        else {
+            completion(
+                .failure(
+                    NSError(
+                        domain: "P256SignerPlugin", code: -2,
+                        userInfo: [NSLocalizedDescriptionKey: "Unexpected credential type"])))
             return
         }
         let res = AssertionResult(
@@ -132,7 +170,9 @@ private final class AssertionDelegate: NSObject, ASAuthorizationControllerDelega
         completion(.success(res))
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    func authorizationController(
+        controller: ASAuthorizationController, didCompleteWithError error: Error
+    ) {
         completion(.failure(error))
     }
 }
