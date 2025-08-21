@@ -12,6 +12,9 @@ let package = Package(
             type: .static,
             targets: ["tauri-plugin-p256-signer"]),
     ],
+    dependencies: [
+      .package(name: "Tauri", path: "../.tauri/tauri-api")
+    ],
     targets: [
         .target(
             name: "tauri-plugin-p256-signer",
