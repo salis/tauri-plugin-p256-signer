@@ -1,98 +1,104 @@
 import AuthenticationServices
 import Foundation
 
-@available(iOS 17, *)
 public final class P256SignerPluginCore: NSObject {
 
     public override init() {
         super.init()
     }
-
-    public func createCredential(
-        params: CreateCredentialParams,
-        completion: @escaping (Result<CredentialResult, Error>) -> Void
-    ) {
-        do {
-            let challenge = try Base64URL.decode(params.challenge)
-            let userID = try Base64URL.decode(params.userId)
-
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
-                relyingPartyIdentifier: params.rpId)
-            let request = provider.createCredentialRegistrationRequest(
-                challenge: challenge,
-                name: params.userName,
-                userID: userID
-            )
-            if let displayName = params.userDisplayName {
-                request.displayName = displayName
+    
+        public func createCredential(
+            params: CreateCredentialParams,
+            completion: @escaping (Result<CredentialResult, Error>) -> Void
+        ) {
+            if #available(iOS 17.0, *) {
+                do {
+                    let challenge = try Base64URL.decode(params.challenge)
+                    let userID = try Base64URL.decode(params.userId)
+                    
+                    let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                        relyingPartyIdentifier: params.rpId)
+                    let request = provider.createCredentialRegistrationRequest(
+                        challenge: challenge,
+                        name: params.userName,
+                        userID: userID
+                    )
+                    if let displayName = params.userDisplayName {
+                        request.displayName = displayName
+                    }
+                    
+                    let controller = ASAuthorizationController(authorizationRequests: [request])
+                    let delegate = RegistrationDelegate { result in
+                        completion(result)
+                    }
+                    controller.delegate = delegate
+                    controller.presentationContextProvider = nil
+                    objc_setAssociatedObject(
+                        controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+                    )
+                    controller.performRequests()
+                } catch {
+                    completion(.failure(error))
+                }
             }
-
-            let controller = ASAuthorizationController(authorizationRequests: [request])
-            let delegate = RegistrationDelegate { result in
-                completion(result)
-            }
-            controller.delegate = delegate
-            controller.presentationContextProvider = nil
-            objc_setAssociatedObject(
-                controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
-            controller.performRequests()
-        } catch {
-            completion(.failure(error))
         }
-    }
+
 
     public func getCredential(
         params: GetCredentialParams, completion: @escaping (Result<AssertionResult, Error>) -> Void
     ) {
-        do {
-            let challenge = try Base64URL.decode(params.challenge)
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
-                relyingPartyIdentifier: params.rpId)
-            let request = provider.createCredentialAssertionRequest(challenge: challenge)
-
-            let controller = ASAuthorizationController(authorizationRequests: [request])
-            let delegate = AssertionDelegate { result in
-                completion(result)
+        if #available(iOS 17.0, *) {
+            do {
+                let challenge = try Base64URL.decode(params.challenge)
+                let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                    relyingPartyIdentifier: params.rpId)
+                let request = provider.createCredentialAssertionRequest(challenge: challenge)
+                
+                let controller = ASAuthorizationController(authorizationRequests: [request])
+                let delegate = AssertionDelegate { result in
+                    completion(result)
+                }
+                controller.delegate = delegate
+                controller.presentationContextProvider = nil
+                objc_setAssociatedObject(
+                    controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+                )
+                controller.performRequests()
+            } catch {
+                completion(.failure(error))
             }
-            controller.delegate = delegate
-            controller.presentationContextProvider = nil
-            objc_setAssociatedObject(
-                controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
-            controller.performRequests()
-        } catch {
-            completion(.failure(error))
         }
     }
 
     public func sign(
         params: SignParams, completion: @escaping (Result<AssertionResult, Error>) -> Void
     ) {
-        do {
-            let challenge = try Base64URL.decode(params.challenge)
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
-                relyingPartyIdentifier: params.rpId)
-            let request = provider.createCredentialAssertionRequest(challenge: challenge)
-            if let allow = params.allowCredentialIds {
-                request.allowedCredentials = try allow.map {
-                    let id = try Base64URL.decode($0)
-                    return ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: id)
+        if #available(iOS 17.0, *) {
+            do {
+                let challenge = try Base64URL.decode(params.challenge)
+                let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                    relyingPartyIdentifier: params.rpId)
+                let request = provider.createCredentialAssertionRequest(challenge: challenge)
+                if let allow = params.allowCredentialIds {
+                    request.allowedCredentials = try allow.map {
+                        let id = try Base64URL.decode($0)
+                        return ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: id)
+                    }
                 }
+                
+                let controller = ASAuthorizationController(authorizationRequests: [request])
+                let delegate = AssertionDelegate { result in
+                    completion(result)
+                }
+                controller.delegate = delegate
+                controller.presentationContextProvider = nil
+                objc_setAssociatedObject(
+                    controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+                )
+                controller.performRequests()
+            } catch {
+                completion(.failure(error))
             }
-
-            let controller = ASAuthorizationController(authorizationRequests: [request])
-            let delegate = AssertionDelegate { result in
-                completion(result)
-            }
-            controller.delegate = delegate
-            controller.presentationContextProvider = nil
-            objc_setAssociatedObject(
-                controller, AssociationKey.delegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
-            controller.performRequests()
-        } catch {
-            completion(.failure(error))
         }
     }
 }
