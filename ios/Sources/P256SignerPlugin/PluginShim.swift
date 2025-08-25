@@ -36,7 +36,7 @@ public class P256SignerPlugin: Plugin {
 
     // create_credential(params: CreateCredentialParams)
     @objc public func create_credential(_ invoke: Invoke) throws {
-        guard let params: CreateCredentialParams = parseOrReject(CreateCredentialParams.self, invoke) else { return }
+        // guard let params: CreateCredentialParams = parseOrReject(CreateCredentialParams.self, invoke) else { return }
         core.createCredential(params: params) { result in
             switch result {
             case .success(let cred):
@@ -49,7 +49,7 @@ public class P256SignerPlugin: Plugin {
 
     // get_credential(params: GetCredentialParams)
     @objc public func get_credential(_ invoke: Invoke) throws {
-        guard let params: GetCredentialParams = parseOrReject(GetCredentialParams.self, invoke) else { return }
+        // guard let params: GetCredentialParams = parseOrReject(GetCredentialParams.self, invoke) else { return }
         core.getCredential(params: params) { result in
             switch result {
             case .success(let assertion):
@@ -62,7 +62,7 @@ public class P256SignerPlugin: Plugin {
 
     // sign(params: SignParams)
     @objc public func sign(_ invoke: Invoke) throws {
-        guard let params: SignParams = parseOrReject(SignParams.self, invoke) else { return }
+        // guard let params: SignParams = parseOrReject(SignParams.self, invoke) else { return }
         core.sign(params: params) { result in
             switch result {
             case .success(let assertion):
